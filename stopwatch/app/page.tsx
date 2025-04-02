@@ -11,42 +11,52 @@ interface timer {
   ms: number;
 }
 export default function Home() {
-  const [timerDetails, setTimerDetails] = useState<timer>({
+  const timerObj = {
     hrs: 0,
     min: 0,
     sec: 0,
     ms: 0,
-  });
+  };
+  const [timerDetails, setTimerDetails] = useState<timer>(timerObj);
+  const [isTimerRunning, setIsTimerRunning] = useState<boolean>(false);
   const intervalId = useRef<NodeJS.Timeout | null>(null);
 
   const handleTimerTrigger = () => {
     if (intervalId.current) {
       clearInterval(intervalId.current);
       intervalId.current = null;
+      setIsTimerRunning(false);
     }
-    const timerDetailsCopy = { ...timerDetails };
-    const localIntervalId = setInterval(() => {
-      timerDetailsCopy.ms = timerDetailsCopy.ms + 1;
-      if (timerDetailsCopy.ms === 100) {
-        timerDetailsCopy.sec = timerDetailsCopy.sec + 1;
-        timerDetailsCopy.ms = 0;
-      }
-      if (timerDetailsCopy.sec === 60) {
-        timerDetailsCopy.min = timerDetailsCopy.min + 1;
-        timerDetailsCopy.sec = 0;
-      }
-      if (timerDetailsCopy.min === 60) {
-        timerDetailsCopy.hrs = timerDetailsCopy.hrs + 1;
-        timerDetailsCopy.min = 0;
-      }
-      setTimerDetails({ ...timerDetailsCopy });
-    }, 10);
-    intervalId.current = localIntervalId;
+    if (intervalId.current === null && !isTimerRunning) {
+      const timerDetailsCopy = { ...timerDetails };
+      const localIntervalId = setInterval(() => {
+        timerDetailsCopy.ms = timerDetailsCopy.ms + 1;
+        if (timerDetailsCopy.ms === 100) {
+          timerDetailsCopy.sec = timerDetailsCopy.sec + 1;
+          timerDetailsCopy.ms = 0;
+        }
+        if (timerDetailsCopy.sec === 60) {
+          timerDetailsCopy.min = timerDetailsCopy.min + 1;
+          timerDetailsCopy.sec = 0;
+        }
+        if (timerDetailsCopy.min === 60) {
+          timerDetailsCopy.hrs = timerDetailsCopy.hrs + 1;
+          timerDetailsCopy.min = 0;
+        }
+        setTimerDetails({ ...timerDetailsCopy });
+      }, 10);
+      intervalId.current = localIntervalId;
+      setIsTimerRunning(true);
+    }
   };
   const handleResetTimer = () => {
     if (intervalId.current) {
       clearInterval(intervalId.current);
       intervalId.current = null;
+      setTimerDetails(timerObj);
+      setIsTimerRunning(false);
+    } else {
+      setTimerDetails(timerObj);
     }
   };
 
@@ -62,8 +72,10 @@ export default function Home() {
         .{String(timerDetails?.ms).padStart(2, "0")}
       </p>
       <div>
-        <button onClick={handleTimerTrigger}>Start</button>
-        <button onClick={handleResetTimer}>Stop</button>
+        <button onClick={handleTimerTrigger}>
+          {!isTimerRunning ? "Start" : "Stop"}
+        </button>
+        <button onClick={handleResetTimer}>Reset</button>
       </div>
     </div>
   );
