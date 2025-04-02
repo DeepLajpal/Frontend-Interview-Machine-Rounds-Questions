@@ -17,12 +17,10 @@ export default function Home() {
     sec: 0,
     ms: 0,
   });
-  // const [intervalId, setIntervalId] = useState<NodeJS.Timeout | null>(null);
   const intervalId = useRef<NodeJS.Timeout | null>(null);
 
   const handleTimerTrigger = () => {
     if (intervalId.current) {
-      console.log(intervalId.current);
       clearInterval(intervalId.current);
       intervalId.current = null;
     }
@@ -43,14 +41,10 @@ export default function Home() {
       }
       setTimerDetails({ ...timerDetailsCopy });
     }, 10);
-    // setIntervalId(localIntervalId);
     intervalId.current = localIntervalId;
-    console.log(localIntervalId);
-    console.log(intervalId);
   };
   const handleResetTimer = () => {
     if (intervalId.current) {
-      console.log(intervalId.current);
       clearInterval(intervalId.current);
       intervalId.current = null;
     }
@@ -60,12 +54,12 @@ export default function Home() {
     <div className={styles.page}>
       <h1>Stopwatch</h1>
       <p>
-        {/* {timerDetails?.hrs != 0 &&
-          `${String(timerDetails?.hrs).padStart(2, "0")}:`}
-        {timerDetails?.min != 0 &&
-          `${String(timerDetails?.min).padStart(2, "0")}:`}
-        {String(timerDetails?.sec).padStart(2, "0")}. */}
-        {timerDetails?.ms}
+        {timerDetails?.hrs != 0 && `${timerDetails?.hrs}:`}
+        {timerDetails?.min != 0 && `${timerDetails?.min}:`}
+        {timerDetails?.min === 0
+          ? timerDetails?.sec
+          : `${String(timerDetails?.sec).padStart(2, "0")}`}
+        .{String(timerDetails?.ms).padStart(2, "0")}
       </p>
       <div>
         <button onClick={handleTimerTrigger}>Start</button>
